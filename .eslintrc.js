@@ -8,5 +8,9 @@ module.exports = {
   parserOptions: {
     sourceType: 'module',
   },
-  rules: {},
+  rules: {
+    'prettier/prettier': 0,
+    'no-use-before-define': 0,
+    'no-underscore-dangle': 0,
+  },
 };
