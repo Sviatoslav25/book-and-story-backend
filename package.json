@@ -4,6 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
+    "debug": "nodemon --exec babel-node src/index.js",
     "lint": "eslint src/",
     "start": "nodemon --exec babel-node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -39,6 +40,7 @@
     "*.{js,css,md}": "prettier --write"
   },
   "dependencies": {
+    "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "faker": "^5.5.3"
   }

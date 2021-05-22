@@ -4,7 +4,7 @@ export function storyListFactory(n = 20) {
   return [...new Array(n)].map(storyFactory);
 }
 
-export function dataForStoryFromForm() {
+export function dataForStory() {
   return {
     _id: faker.datatype.uuid(),
     authorId: faker.datatype.uuid(),
