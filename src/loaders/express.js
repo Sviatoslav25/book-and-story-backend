@@ -56,4 +56,18 @@ export default function ExpressLoader(app) {
     MockDataService.createStory(body);
     res.json({ status: 'ok' });
   });
+
+  app.post('/api/books/add_rating', (req, res) => {
+    const { body } = req;
+    const result = MockDataService.addRantingForBook(body.bookId, null, body.rating);
+    res.status(result.statusCode);
+    res.json({ status: result.message });
+  });
+
+  app.post('/api/stories/add_rating', (req, res) => {
+    const { body } = req;
+    const result = MockDataService.addRantingForStory(body.storyId, null, body.rating);
+    res.status(result.statusCode);
+    res.json({ status: result.message });
+  });
 }
