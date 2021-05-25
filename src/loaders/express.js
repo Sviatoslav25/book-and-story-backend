@@ -70,4 +70,22 @@ export default function ExpressLoader(app) {
     res.status(result.statusCode);
     res.json({ status: result.message });
   });
+
+  app.get('/api/books/search/:string', (req, res) => {
+    const { params } = req;
+    const { string } = params;
+    const booksFound = MockDataService.getBooks().filter(
+      (book) => book.name.includes(string) || book.description.includes(string)
+    );
+    res.json(booksFound);
+  });
+
+  app.get('/api/stories/search/:string', (req, res) => {
+    const { params } = req;
+    const { string } = params;
+    const storiesFound = MockDataService.getStories().filter(
+      (story) => story.name.includes(string) || story.shortDescription.includes(string)
+    );
+    res.json(storiesFound);
+  });
 }
