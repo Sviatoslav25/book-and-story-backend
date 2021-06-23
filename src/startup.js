@@ -3,7 +3,7 @@ import RootLoader from './loaders';
 
 export default function startServer() {
   const app = express();
-  const port = 3011;
+  const port = process.env.PORT;
 
   RootLoader(app);
 
