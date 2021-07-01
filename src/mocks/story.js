@@ -7,8 +7,7 @@ export function storyListFactory(n = 20) {
 export function dataForStory() {
   return {
     _id: faker.datatype.uuid(),
-    authorId: faker.datatype.uuid(),
-    rating: faker.datatype.number({ min: 1, max: 5 }),
+    rating: 0,
   };
 }
 

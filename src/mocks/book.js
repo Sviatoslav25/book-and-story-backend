@@ -7,8 +7,8 @@ export function bookListFactory(n = 20) {
 export function dataForBook() {
   return {
     _id: faker.datatype.uuid(),
-    authorId: faker.datatype.uuid(),
-    rating: faker.datatype.number({ min: 1, max: 5 }),
+    // authorId: faker.datatype.uuid(),
+    rating: 0,
   };
 }
 

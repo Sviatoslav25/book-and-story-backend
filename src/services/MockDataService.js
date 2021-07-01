@@ -10,6 +10,14 @@ class MockDataService {
     this.storyList = CalculateRating.calculateRatingForStoryList(storyListFactory(), this.ratingForStoryList);
   }
 
+  setBookList = (bookList) => {
+    this.bookList = bookList;
+  };
+
+  setStoryList = (storyList) => {
+    this.storyList = storyList;
+  };
+
   getBooks() {
     return this.bookList;
   }

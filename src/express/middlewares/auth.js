@@ -12,7 +12,7 @@ const authMiddleware = (req, res, next) => {
     };
     return next();
   } catch (e) {
-    return res.sendStatus(403);
+    return res.sendStatus(401);
   }
 };
 

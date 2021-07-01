@@ -4,12 +4,12 @@ const defaultUsers = [
   {
     _id: '1',
     email: 'bbb@ggg.com',
-    password: '12345',
+    password: '1234567',
   },
   {
     _id: '2',
     email: 'aaa@ggg.com',
-    password: '12345',
+    password: '1234567',
   },
 ];
 
