@@ -1,2 +1,6 @@
 node_modules/
 .env
+.eslintcache
+.mongo/db/*
+.mongo/mongod.log
+!.mongo/db/.gitkeep

@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import express from 'express';
 import RootLoader from './loaders';
+import logger from './utilse/logger';
 
 export default async function startServer() {
   try {
@@ -10,7 +11,7 @@ export default async function startServer() {
     await RootLoader(app);
 
     app.listen(port, () => {
-      console.log(`Example app listening at http://localhost:${port}`);
+      logger.info(`Example app listening at http://localhost:${port}`);
     });
   } catch (e) {
     console.log(e.messages);
