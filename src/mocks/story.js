@@ -6,14 +6,12 @@ export function storyListFactory(n = 20) {
 
 export function dataForStory() {
   return {
-    _id: faker.datatype.uuid(),
     rating: 0,
   };
 }
 
 export function storyFactory() {
   return {
-    _id: faker.datatype.uuid(),
     name: faker.lorem.words(),
     date: faker.date.past(),
     authorId: faker.datatype.uuid(),

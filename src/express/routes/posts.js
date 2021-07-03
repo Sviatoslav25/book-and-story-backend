@@ -4,17 +4,19 @@ import StoryService from '../../services/StoryService';
 import authMiddleware from '../middlewares/auth';
 
 const addPostRoutes = (app) => {
-  app.get('/api/books/all', authMiddleware, (req, res) => {
-    res.json(MockDataService.getBooks());
+  app.get('/api/books/all', authMiddleware, async (req, res) => {
+    const books = await BookService.getBooks();
+    res.json(books);
   });
 
-  app.get('/api/stories/all', authMiddleware, (req, res) => {
-    res.json(MockDataService.getStories());
+  app.get('/api/stories/all', authMiddleware, async (req, res) => {
+    const stories = await StoryService.getStories();
+    res.json(stories);
   });
 
-  app.get('/api/books/book/:id', authMiddleware, (req, res) => {
+  app.get('/api/books/book/:id', authMiddleware, async (req, res) => {
     const { params } = req;
-    const book = MockDataService.getBookById(params.id);
+    const book = await BookService.getBookById(params.id);
     if (book) {
       res.json(book);
     } else {
@@ -27,9 +29,9 @@ const addPostRoutes = (app) => {
     }
   });
 
-  app.get('/api/stories/story/:id', authMiddleware, (req, res) => {
+  app.get('/api/stories/story/:id', authMiddleware, async (req, res) => {
     const { params } = req;
-    const story = MockDataService.getStoryById(params.id);
+    const story = await StoryService.getStoryById(params.id);
     if (story) {
       res.json(story);
     } else {
@@ -42,10 +44,10 @@ const addPostRoutes = (app) => {
     }
   });
 
-  app.post('/api/books/create', authMiddleware, (req, res) => {
+  app.post('/api/books/create', authMiddleware, async (req, res) => {
     const { body } = req;
     const bookData = { ...body, authorId: req.jwtUser._id };
-    MockDataService.createBook(bookData);
+    await BookService.createBook(bookData);
     res.json({ status: 'ok' });
   });
 
@@ -70,21 +72,17 @@ const addPostRoutes = (app) => {
     res.json({ status: result.message });
   });
 
-  app.get('/api/books/search/:string', authMiddleware, (req, res) => {
+  app.get('/api/books/search/:string', authMiddleware, async (req, res) => {
     const { params } = req;
     const { string } = params;
-    const booksFound = MockDataService.getBooks().filter(
-      (book) => book.name.includes(string) || book.description.includes(string)
-    );
+    const booksFound = await BookService.searchBooks(string);
     res.json(booksFound);
   });
 
-  app.get('/api/stories/search/:string', authMiddleware, (req, res) => {
+  app.get('/api/stories/search/:string', authMiddleware, async (req, res) => {
     const { params } = req;
     const { string } = params;
-    const storiesFound = MockDataService.getStories().filter(
-      (story) => story.name.includes(string) || story.shortDescription.includes(string)
-    );
+    const storiesFound = await StoryService.searchStory(string);
     res.json(storiesFound);
   });
 

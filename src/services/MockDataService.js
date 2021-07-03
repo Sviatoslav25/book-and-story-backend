@@ -1,4 +1,4 @@
-import { bookListFactory, dataForBook } from '../mocks/book';
+import { bookListFactory } from '../mocks/book';
 import { dataForStory, storyListFactory } from '../mocks/story';
 import CalculateRating from './CalculateRating';
 
@@ -18,14 +18,6 @@ class MockDataService {
     this.storyList = storyList;
   };
 
-  getBooks() {
-    return this.bookList;
-  }
-
-  getBookById(id) {
-    return this.bookList.find((book) => book._id === id);
-  }
-
   getStories() {
     return this.storyList;
   }
@@ -37,11 +29,6 @@ class MockDataService {
   createStory(storyData) {
     const story = { ...storyData, ...dataForStory() };
     this.storyList = [story, ...this.storyList];
-  }
-
-  createBook(bookData) {
-    const book = { ...bookData, ...dataForBook() };
-    this.bookList = [book, ...this.bookList];
   }
 
   addRantingForBook(bookId, userId, rating) {

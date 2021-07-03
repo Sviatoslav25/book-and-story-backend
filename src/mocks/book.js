@@ -6,7 +6,6 @@ export function bookListFactory(n = 20) {
 
 export function dataForBook() {
   return {
-    _id: faker.datatype.uuid(),
     // authorId: faker.datatype.uuid(),
     rating: 0,
   };
@@ -14,7 +13,6 @@ export function dataForBook() {
 
 export function bookFactory() {
   return {
-    _id: faker.datatype.uuid(),
     name: faker.lorem.words(),
     img: 'https://st2.depositphotos.com/1105977/5461/i/600/depositphotos_54615585-stock-photo-old-books-on-wooden-table.jpg',
     date: faker.date.past(),
