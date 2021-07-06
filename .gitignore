@@ -4,3 +4,4 @@ node_modules/
 .mongo/db/*
 .mongo/mongod.log
 !.mongo/db/.gitkeep
+/build
