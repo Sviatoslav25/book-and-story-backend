@@ -1,5 +1,5 @@
 import BookService from '../../services/BookService';
-import MockDataService from '../../services/MockDataService';
+import RatingService from '../../services/RatingService';
 import StoryService from '../../services/StoryService';
 import authMiddleware from '../middlewares/auth';
 
@@ -48,63 +48,74 @@ const addPostRoutes = (app) => {
     const { body } = req;
     const bookData = { ...body, authorId: req.jwtUser._id };
     await BookService.createBook(bookData);
-    res.json({ status: 'ok' });
+    return res.json({ status: 'ok' });
   });
 
-  app.post('/api/stories/create', authMiddleware, (req, res) => {
+  app.post('/api/stories/create', authMiddleware, async (req, res) => {
     const { body } = req;
     const storyData = { ...body, authorId: req.jwtUser._id };
-    MockDataService.createStory(storyData);
-    res.json({ status: 'ok' });
+    await StoryService.createStory(storyData);
+    return res.json({ status: 'ok' });
   });
 
-  app.post('/api/books/add_rating', authMiddleware, (req, res) => {
+  app.post('/api/books/add_rating', authMiddleware, async (req, res) => {
     const { body } = req;
-    const result = MockDataService.addRantingForBook(body.bookId, null, body.rating);
-    res.status(result.statusCode);
-    res.json({ status: result.message });
+    await RatingService.addRatingForBooks({
+      bookId: body.bookId,
+      userId: req.jwtUser._id,
+      rating: body.rating,
+    });
+    return res.json({ status: 'ok' });
   });
 
-  app.post('/api/stories/add_rating', authMiddleware, (req, res) => {
+  app.post('/api/stories/add_rating', authMiddleware, async (req, res) => {
     const { body } = req;
-    const result = MockDataService.addRantingForStory(body.storyId, null, body.rating);
-    res.status(result.statusCode);
-    res.json({ status: result.message });
+    await RatingService.addRatingForStories({
+      storyId: body.storyId,
+      userId: req.jwtUser._id,
+      rating: body.rating,
+    });
+    return res.json({ status: 'ok' });
   });
 
   app.get('/api/books/search/:string', authMiddleware, async (req, res) => {
     const { params } = req;
     const { string } = params;
     const booksFound = await BookService.searchBooks(string);
-    res.json(booksFound);
+    return res.json(booksFound);
   });
 
   app.get('/api/stories/search/:string', authMiddleware, async (req, res) => {
     const { params } = req;
     const { string } = params;
     const storiesFound = await StoryService.searchStory(string);
-    res.json(storiesFound);
+    return res.json(storiesFound);
   });
 
-  app.get('/api/books/my', authMiddleware, (req, res) => {
-    const books = BookService.getMyBooks(req.jwtUser._id);
+  app.get('/api/books/my', authMiddleware, async (req, res) => {
+    const books = await BookService.getMyBooks(req.jwtUser._id);
     return res.json(books);
   });
 
-  app.delete('/api/books/delete/:id', authMiddleware, (req, res) => {
+  app.delete('/api/books/delete/:id', authMiddleware, async (req, res) => {
     const { params } = req;
-    BookService.deleteBooks({ authorId: req.jwtUser._id, bookId: params.id });
+    try {
+      await BookService.deleteBooks({ authorId: req.jwtUser._id, bookId: params.id });
+    } catch (e) {
+      res.status(404);
+      return res.json({ error: e.message });
+    }
     return res.json({ status: 'ok' });
   });
 
-  app.get('/api/stories/my', authMiddleware, (req, res) => {
-    const stories = StoryService.getMyStories(req.jwtUser._id);
+  app.get('/api/stories/my', authMiddleware, async (req, res) => {
+    const stories = await StoryService.getMyStories(req.jwtUser._id);
     res.json(stories);
   });
 
-  app.delete('/api/stories/delete/:id', authMiddleware, (req, res) => {
+  app.delete('/api/stories/delete/:id', authMiddleware, async (req, res) => {
     const { params } = req;
-    StoryService.deleteStory({ authorId: req.jwtUser._id, storyId: params.id });
+    await StoryService.deleteStory({ authorId: req.jwtUser._id, storyId: params.id });
     return res.json({ status: 'ok' });
   });
 };

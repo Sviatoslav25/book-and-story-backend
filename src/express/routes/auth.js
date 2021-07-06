@@ -1,5 +1,6 @@
 import authMiddleware from '../middlewares/auth';
 import UserService from '../../services/UserService';
+import logger from '../../utils/logger';
 
 const addAuthRoutes = (app) => {
   app.get('/api/auth/greet', authMiddleware, (req, res) => {
@@ -7,8 +8,8 @@ const addAuthRoutes = (app) => {
     return res.send(`Hello ${email}!`);
   });
 
-  app.get('/api/auth/me', authMiddleware, (req, res) => {
-    return res.json(req.getUser());
+  app.get('/api/auth/me', authMiddleware, async (req, res) => {
+    return res.json(await req.getUser());
   });
 
   app.post('/api/auth/login', async (req, res) => {
@@ -16,8 +17,13 @@ const addAuthRoutes = (app) => {
     try {
       const { accessToken, refreshToken } = await UserService.loginWithPassword({ email, password });
       return res.json({ accessToken, refreshToken });
-    } catch (e) {
-      return res.sendStatus(401);
+    } catch (error) {
+      logger.error(error);
+      logger.error(error.message);
+      res.status(403);
+      return res.json({
+        error: error.message,
+      });
     }
   });
 
@@ -43,9 +49,12 @@ const addAuthRoutes = (app) => {
       await UserService.createAccount({ email, password });
       const { accessToken, refreshToken } = await UserService.loginWithPassword({ email, password });
       return res.json({ accessToken, refreshToken });
-    } catch (e) {
+    } catch (error) {
+      logger.error(error);
       res.status(403);
-      return res.json({ error: e.message });
+      return res.json({
+        error: error.message,
+      });
     }
   });
 };

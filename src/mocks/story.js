@@ -4,12 +4,6 @@ export function storyListFactory(n = 20) {
   return [...new Array(n)].map(storyFactory);
 }
 
-export function dataForStory() {
-  return {
-    rating: 0,
-  };
-}
-
 export function storyFactory() {
   return {
     name: faker.lorem.words(),

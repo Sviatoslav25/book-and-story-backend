@@ -1,13 +1,13 @@
 import { bookListFactory } from '../mocks/book';
-import { dataForStory, storyListFactory } from '../mocks/story';
-import CalculateRating from './CalculateRating';
+import { storyListFactory } from '../mocks/story';
+import RatingService from './RatingService';
 
 class MockDataService {
   constructor() {
     this.ratingForBookList = [];
     this.ratingForStoryList = [];
-    this.bookList = CalculateRating.calculateRatingForBookList(bookListFactory(), this.ratingForBookList);
-    this.storyList = CalculateRating.calculateRatingForStoryList(storyListFactory(), this.ratingForStoryList);
+    this.bookList = RatingService.calculateRatingForBookList(bookListFactory(), this.ratingForBookList);
+    this.storyList = RatingService.calculateRatingForStoryList(storyListFactory(), this.ratingForStoryList);
   }
 
   setBookList = (bookList) => {
@@ -26,11 +26,6 @@ class MockDataService {
     return this.storyList.find((story) => story._id === id);
   }
 
-  createStory(storyData) {
-    const story = { ...storyData, ...dataForStory() };
-    this.storyList = [story, ...this.storyList];
-  }
-
   addRantingForBook(bookId, userId, rating) {
     this.ratingForBookList.push({
       bookId,
@@ -44,7 +39,7 @@ class MockDataService {
         message: 'book not found',
       };
     }
-    const bookWithNewRanting = CalculateRating.calculateRantingForBook(book, this.ratingForBookList);
+    const bookWithNewRanting = RatingService.calculateRantingForBook(book, this.ratingForBookList);
     const index = this.bookList.findIndex((item) => item._id === bookId);
     this.bookList[index] = bookWithNewRanting;
     return {
@@ -66,7 +61,7 @@ class MockDataService {
         message: 'story not found',
       };
     }
-    const storyWithNewRanting = CalculateRating.calculateRantingForStory(story, this.ratingForStoryList);
+    const storyWithNewRanting = RatingService.calculateRantingForStory(story, this.ratingForStoryList);
     const index = this.storyList.findIndex((item) => item._id === storyId);
     this.storyList[index] = storyWithNewRanting;
     return {

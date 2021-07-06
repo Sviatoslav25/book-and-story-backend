@@ -18,9 +18,12 @@ const defaultUsers = [
 ];
 
 export default async function fixtures() {
-  defaultUsers.forEach((u) => {
-    UserService.createAccount(u);
-  });
+  const countUsers = await UserService.getCollection().find({}).count();
+  if (countUsers === 0) {
+    defaultUsers.forEach(async (u) => {
+      await UserService.createAccount(u);
+    });
+  }
   const countBooks = await BookService.getCollection().find({}).count();
   if (countBooks === 0) {
     const books = bookListFactory();

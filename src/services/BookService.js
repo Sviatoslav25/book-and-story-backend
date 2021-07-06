@@ -1,6 +1,6 @@
-import { ObjectId } from 'mongodb';
-import MockDataService from './MockDataService';
+import { ObjectID, ObjectId } from 'mongodb';
 import MongoClientProvider from './MongoClientProvider';
+import RatingService from './RatingService';
 
 class BookService {
   collectionName = 'books';
@@ -10,7 +10,8 @@ class BookService {
   }
 
   getBooks = async () => {
-    return this.getCollection().find({}).sort({ createdAt: -1 }).toArray();
+    const bookList = await this.getCollection().find({}).sort({ createdAt: -1 }).toArray();
+    return RatingService.calculateRatingForBookList(bookList);
   };
 
   createBook = async (book) => {
@@ -23,25 +24,28 @@ class BookService {
   };
 
   searchBooks = async (lineForSearch) => {
-    return this.getCollection()
+    const books = await this.getCollection()
       .find({
         $or: [
           { name: { $regex: lineForSearch, $options: 'i' } },
           { description: { $regex: lineForSearch, $options: 'i' } },
         ],
       })
+      .sort({ createdAt: -1 })
       .toArray();
+    return RatingService.calculateRatingForBookList(books);
   };
 
-  getMyBooks = (authorId) => {
-    const books = MockDataService.getBooks();
-    return books.filter((book) => book.authorId === authorId);
+  getMyBooks = async (authorId) => {
+    const books = await this.getCollection().find({ authorId }).sort({ createdAt: -1 }).toArray();
+    return books;
   };
 
-  deleteBooks = ({ authorId, bookId }) => {
-    let books = MockDataService.getBooks();
-    books = books.filter((book) => book._id !== bookId || !(book.authorId === authorId));
-    MockDataService.setBookList(books);
+  deleteBooks = async ({ authorId, bookId }) => {
+    const result = await this.getCollection().removeOne({ _id: ObjectID(bookId), authorId });
+    if (result.result.n === 0) {
+      throw new Error('book has not been deleted');
+    }
   };
 }
 

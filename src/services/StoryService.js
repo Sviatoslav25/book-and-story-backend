@@ -1,6 +1,6 @@
-import { ObjectId } from 'mongodb';
-import MockDataService from './MockDataService';
+import { ObjectID, ObjectId } from 'mongodb';
 import MongoClientProvider from './MongoClientProvider';
+import RatingService from './RatingService';
 
 class StoryService {
   collectionName = 'stories';
@@ -10,7 +10,8 @@ class StoryService {
   };
 
   getStories = async () => {
-    return this.getCollection().find({}).toArray();
+    const storyList = await this.getCollection().find({}).sort({ createdAt: -1 }).toArray();
+    return RatingService.calculateRatingForStoryList(storyList);
   };
 
   getStoryById = async (_id) => {
@@ -18,29 +19,33 @@ class StoryService {
   };
 
   createStory = async (story) => {
-    return this.getCollection().insert(story);
+    const storyData = { ...story, rating: 0, createdAt: new Date() };
+    return this.getCollection().insert(storyData);
   };
 
   searchStory = async (lineForSearch) => {
-    return this.getCollection()
+    const stories = await this.getCollection()
       .find({
         $or: [
           { name: { $regex: lineForSearch, $options: 'i' } },
           { shortDescription: { $regex: lineForSearch, $options: 'i' } },
         ],
       })
+      .sort({ createdAt: -1 })
       .toArray();
+    return RatingService.calculateRatingForStoryList(stories);
   };
 
-  getMyStories = (authorId) => {
-    const stories = MockDataService.getStories();
-    return stories.filter((story) => story.authorId === authorId);
+  getMyStories = async (authorId) => {
+    const books = await this.getCollection().find({ authorId }).sort({ createdAt: -1 }).toArray();
+    return books;
   };
 
-  deleteStory = ({ authorId, storyId }) => {
-    let stories = MockDataService.getStories();
-    stories = stories.filter((story) => story._id !== storyId || !(authorId === story.authorId));
-    MockDataService.setStoryList(stories);
+  deleteStory = async ({ authorId, storyId }) => {
+    const result = await this.getCollection().removeOne({ _id: ObjectID(storyId), authorId });
+    if (result.result.n === 0) {
+      throw new Error('story has not been deleted');
+    }
   };
 }
 

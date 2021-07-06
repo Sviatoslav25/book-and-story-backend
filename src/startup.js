@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import express from 'express';
 import RootLoader from './loaders';
-import logger from './utilse/logger';
+import logger from './utils/logger';
 
 export default async function startServer() {
   try {

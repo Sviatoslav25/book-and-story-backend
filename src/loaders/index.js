@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import logger from '../utilse/logger';
+import logger from '../utils/logger';
 import dbLoader from './db';
 import expressLoader from './express';
 import fixturesLoader from './fixture';

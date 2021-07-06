@@ -1,9 +1,14 @@
 import bcrypt from 'bcrypt';
 import { omit } from 'lodash';
 import AuthService from './AuthService';
+import MongoClientProvider from './MongoClientProvider';
 
 class UserService {
-  users = [];
+  collectionName = 'users';
+
+  getCollection = () => {
+    return MongoClientProvider.db.collection(this.collectionName);
+  };
 
   #privateFields = ['hashPassword'];
 
@@ -11,8 +16,8 @@ class UserService {
     return omit(user, this.#privateFields);
   }
 
-  findByEmail(email, shouldIncludePrivateFields) {
-    const user = this.users.find((u) => u.email === email);
+  async findByEmail(email, shouldIncludePrivateFields) {
+    const user = await this.getCollection().findOne({ email });
     if (!user) {
       return null;
     }
@@ -22,8 +27,9 @@ class UserService {
     return this.#omitPrivateFields(user);
   }
 
-  findById(id, shouldIncludePrivateFields) {
-    const user = this.users.find((u) => u._id === id);
+  async findById(_id, shouldIncludePrivateFields) {
+    const user = await this.getCollection().findOne({ _id });
+
     if (!user) {
       return null;
     }
@@ -34,17 +40,17 @@ class UserService {
   }
 
   async createAccount({ email, password }) {
-    let user = this.findByEmail(email);
+    let user = await this.findByEmail(email);
     if (user) {
       throw new Error('user with this email already registered');
     }
     const hashPassword = await bcrypt.hash(password, 10);
-    user = { _id: this.users.length + 1, email, hashPassword };
-    this.users.push(user);
+    user = { hashPassword, email, createAt: new Date() };
+    this.getCollection().insert(user);
   }
 
   async loginWithPassword({ email, password }) {
-    const user = this.findByEmail(email, true);
+    const user = await this.findByEmail(email, true);
     if (!user) {
       throw new Error('User not found');
     }
