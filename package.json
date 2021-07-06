@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "",
   "main": "src/index.js",
+  "engine": {
+    "npm": "6",
+    "node": "v14"
+  },
   "scripts": {
     "mongo:start": "mongod --config ./mongod.cfg",
     "debug": "nodemon --exec babel-node src/index.js",
