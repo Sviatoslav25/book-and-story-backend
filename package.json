@@ -9,7 +9,7 @@
     "lint": "eslint src/",
     "start": "nodemon --exec babel-node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "rd build && mkdir build",
+    "clean": "rm -rf build && mkdir build",
     "build": "npm run clean && npm run build-server",
     "build-server": "babel -d ./build ./src -s --copy-files",
     "prepare": "husky install"
