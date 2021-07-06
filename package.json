@@ -44,6 +44,7 @@
     "*.{js,css,md}": "prettier --write"
   },
   "dependencies": {
+    "@babel/cli": "^7.14.5",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "dotenv": "^10.0.0",
