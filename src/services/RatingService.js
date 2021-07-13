@@ -1,4 +1,3 @@
-import { ObjectID } from 'mongodb';
 import MongoClientProvider from './MongoClientProvider';
 
 class RatingService {

@@ -36,7 +36,7 @@ class StoryService {
     return RatingService.calculateRatingForStoryList(stories);
   };
 
-  getMyStories = async (authorId) => {
+  getMyStories = async ({ userId: authorId }) => {
     const books = await this.getCollection().find({ authorId }).sort({ createdAt: -1 }).toArray();
     return books;
   };

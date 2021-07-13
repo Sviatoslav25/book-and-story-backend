@@ -36,16 +36,20 @@ class BookService {
     return RatingService.calculateRatingForBookList(books);
   };
 
-  getMyBooks = async (authorId) => {
+  getMyBooks = async ({ userId: authorId }) => {
     const books = await this.getCollection().find({ authorId }).sort({ createdAt: -1 }).toArray();
     return books;
   };
 
-  deleteBooks = async ({ authorId, bookId }) => {
+  deleteBooks = async (bookId, { userId: authorId }) => {
     const result = await this.getCollection().removeOne({ _id: ObjectID(bookId), authorId });
     if (result.result.n === 0) {
       throw new Error('book has not been deleted');
     }
+  };
+
+  updateBook = async (_id, data, { userId: authorId }) => {
+    return this.getCollection().updateOne({ _id: ObjectID(_id), authorId }, { $set: data });
   };
 }
 
