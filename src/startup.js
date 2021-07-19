@@ -11,7 +11,13 @@ export default async function startServer() {
     await RootLoader(app);
 
     app.listen(port, () => {
-      logger.info(`Example app listening at http://localhost:${port}`);
+      logger.info(`
+        #############################################
+          Server listening on port: ${port} 
+          Address: http://localhost:${port} ️
+          GraphQL: http://localhost:${port}/graphql ️
+        #############################################
+      `);
     });
   } catch (e) {
     console.log(e.messages);

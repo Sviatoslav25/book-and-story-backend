@@ -1,3 +1,4 @@
+import { ObjectID } from 'mongodb';
 import MongoClientProvider from './MongoClientProvider';
 
 class RatingService {
@@ -14,11 +15,15 @@ class RatingService {
   };
 
   addRatingForBooks = async ({ bookId, userId, rating }) => {
-    return this.getCollectionForBook().insert({ bookId, userId, rating });
+    return this.getCollectionForBook().insert({ bookId: new ObjectID(bookId), userId: new ObjectID(userId), rating });
   };
 
   addRatingForStories = async ({ storyId, userId, rating }) => {
-    return this.getCollectionForStories().insert({ storyId, userId, rating });
+    return this.getCollectionForStories().insert({
+      storyId: new ObjectID(storyId),
+      userId: new ObjectID(userId),
+      rating,
+    });
   };
 
   calculateRatingForBookList = async (bookList) => {
@@ -30,7 +35,7 @@ class RatingService {
       if (ratingForBook) {
         return { ...book, rating: ratingForBook.avg };
       }
-      return book;
+      return { ...book, rating: 0 };
     });
     return bookListWithRating;
     // const bookListId=bookList.map((book)=>book._id);
@@ -48,20 +53,10 @@ class RatingService {
       if (ratingForStory) {
         return { ...story, rating: ratingForStory.avg };
       }
-      return story;
+      return { ...story, rating: 0 };
     });
     return storyListWithRating;
   };
-
-  calculateRantingForBook(book, ratingForBooks) {
-    const arrayRating = ratingForBooks.filter((item) => book._id === item.bookId);
-    return { ...book, rating: this.calculateAverageRating(arrayRating) };
-  }
-
-  calculateRantingForStory(story, ratingForStories) {
-    const arrayRating = ratingForStories.filter((item) => story._id === item.storyId);
-    return { ...story, rating: this.calculateAverageRating(arrayRating) };
-  }
 }
 
 export default new RatingService();

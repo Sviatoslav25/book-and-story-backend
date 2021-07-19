@@ -14,9 +14,10 @@ class BookService {
     return RatingService.calculateRatingForBookList(bookList);
   };
 
-  createBook = async (book) => {
-    const bookData = { ...book, rating: 0, createdAt: new Date() };
-    return this.getCollection().insert(bookData);
+  createBook = async (book, authorId) => {
+    const bookData = { ...book, createdAt: new Date(), updateAt: new Date(), authorId: new ObjectID(authorId) };
+    const result = await this.getCollection().insert(bookData);
+    return { ...book, _id: result.insertedId };
   };
 
   getBookById = async (_id) => {
@@ -37,19 +38,31 @@ class BookService {
   };
 
   getMyBooks = async ({ userId: authorId }) => {
-    const books = await this.getCollection().find({ authorId }).sort({ createdAt: -1 }).toArray();
+    const books = await this.getCollection()
+      .find({ authorId: new ObjectID(authorId) })
+      .sort({ createdAt: -1 })
+      .toArray();
     return books;
   };
 
-  deleteBooks = async (bookId, { userId: authorId }) => {
-    const result = await this.getCollection().removeOne({ _id: ObjectID(bookId), authorId });
+  deleteBook = async (bookId, { userId: authorId }) => {
+    const result = await this.getCollection().removeOne({ _id: ObjectID(bookId), authorId: new ObjectID(authorId) });
     if (result.result.n === 0) {
       throw new Error('book has not been deleted');
     }
   };
 
   updateBook = async (_id, data, { userId: authorId }) => {
-    return this.getCollection().updateOne({ _id: ObjectID(_id), authorId }, { $set: data });
+    return this.getCollection().updateOne({ _id: ObjectID(_id), authorId: new ObjectID(authorId) }, { $set: data });
+  };
+
+  canViewBook = (book, userId) => {
+    const authorObjectId = new ObjectID(book.authorId);
+    const userObjectId = new ObjectID(userId);
+    if (authorObjectId.equals(userObjectId)) {
+      return true;
+    }
+    return false;
   };
 }
 

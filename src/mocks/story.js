@@ -12,6 +12,5 @@ export function storyFactory() {
     genre: faker.lorem.words(),
     shortDescription: faker.lorem.paragraph(),
     story: faker.lorem.paragraphs(),
-    rating: faker.datatype.number({ min: 1, max: 5 }),
   };
 }

@@ -18,9 +18,10 @@ class StoryService {
     return this.getCollection().findOne({ _id: ObjectId(_id) });
   };
 
-  createStory = async (story) => {
-    const storyData = { ...story, rating: 0, createdAt: new Date() };
-    return this.getCollection().insert(storyData);
+  createStory = async (story, authorId) => {
+    const storyData = { ...story, createdAt: new Date(), updateAt: new Date(), authorId: new ObjectID(authorId) };
+    const result = this.getCollection().insert(storyData);
+    return { ...story, _id: result.insertedId };
   };
 
   searchStory = async (lineForSearch) => {
@@ -37,15 +38,31 @@ class StoryService {
   };
 
   getMyStories = async ({ userId: authorId }) => {
-    const books = await this.getCollection().find({ authorId }).sort({ createdAt: -1 }).toArray();
-    return books;
+    const stories = await this.getCollection()
+      .find({ authorId: new ObjectID(authorId) })
+      .sort({ createdAt: -1 })
+      .toArray();
+    return stories;
   };
 
-  deleteStory = async ({ authorId, storyId }) => {
-    const result = await this.getCollection().removeOne({ _id: ObjectID(storyId), authorId });
+  deleteStory = async ({ userId: authorId, storyId }) => {
+    const result = await this.getCollection().removeOne({ _id: ObjectID(storyId), authorId: new ObjectID(authorId) });
     if (result.result.n === 0) {
       throw new Error('story has not been deleted');
     }
+  };
+
+  updateStory = async (_id, data, { userId: authorId }) => {
+    return this.getCollection().updateOne({ _id: ObjectID(_id), authorId: new ObjectID(authorId) }, { $set: data });
+  };
+
+  canViewStory = (story, userId) => {
+    const authorObjectId = new ObjectID(story.authorId);
+    const userObjectId = new ObjectID(userId);
+    if (authorObjectId.equals(userObjectId)) {
+      return true;
+    }
+    return false;
   };
 }
 

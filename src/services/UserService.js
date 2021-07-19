@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import { omit } from 'lodash';
+import { ObjectID } from 'mongodb';
 import AuthService from './AuthService';
 import MongoClientProvider from './MongoClientProvider';
 
@@ -28,8 +29,7 @@ class UserService {
   }
 
   async findById(_id, shouldIncludePrivateFields) {
-    const user = await this.getCollection().findOne({ _id });
-
+    const user = await this.getCollection().findOne({ _id: new ObjectID(_id) });
     if (!user) {
       return null;
     }
