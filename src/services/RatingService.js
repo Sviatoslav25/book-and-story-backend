@@ -15,14 +15,20 @@ class RatingService {
   };
 
   addRatingForBooks = async ({ bookId, userId, rating }) => {
-    return this.getCollectionForBook().insert({ bookId: new ObjectID(bookId), userId: new ObjectID(userId), rating });
+    return this.getCollectionForBook().insertOne({
+      bookId: new ObjectID(bookId),
+      userId: new ObjectID(userId),
+      rating,
+      createAt: new Date(),
+    });
   };
 
   addRatingForStories = async ({ storyId, userId, rating }) => {
-    return this.getCollectionForStories().insert({
+    return this.getCollectionForStories().insertOne({
       storyId: new ObjectID(storyId),
       userId: new ObjectID(userId),
       rating,
+      createAt: new Date(),
     });
   };
 
@@ -31,7 +37,7 @@ class RatingService {
       .aggregate([{ $group: { _id: '$bookId', avg: { $avg: '$rating' } } }])
       .toArray();
     const bookListWithRating = bookList.map((book) => {
-      const ratingForBook = ratings.find((rating) => rating._id === book._id.toString());
+      const ratingForBook = ratings.find((rating) => rating._id.equals(book._id));
       if (ratingForBook) {
         return { ...book, rating: ratingForBook.avg };
       }
@@ -49,7 +55,7 @@ class RatingService {
       .aggregate([{ $group: { _id: '$storyId', avg: { $avg: '$rating' } } }])
       .toArray();
     const storyListWithRating = storyList.map((story) => {
-      const ratingForStory = ratings.find((rating) => rating._id === story._id.toString());
+      const ratingForStory = ratings.find((rating) => rating._id.equals(story._id));
       if (ratingForStory) {
         return { ...story, rating: ratingForStory.avg };
       }

@@ -79,7 +79,7 @@ class BookRoutesController {
 
   deleteBook = async (req, res) => {
     const { params } = req;
-    await BookService.deleteBooks(params.id, createContext(req));
+    await BookService.deleteBook(params.id, createContext(req));
     return res.json({ status: 'ok' });
   };
 

@@ -20,7 +20,7 @@ class StoryService {
 
   createStory = async (story, authorId) => {
     const storyData = { ...story, createdAt: new Date(), updateAt: new Date(), authorId: new ObjectID(authorId) };
-    const result = this.getCollection().insert(storyData);
+    const result = await this.getCollection().insertOne(storyData);
     return { ...story, _id: result.insertedId };
   };
 

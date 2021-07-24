@@ -6,7 +6,6 @@ export const typeDefs = gql`
   type Story {
     _id: ID!
     name: String!
-    date: Float!
     authorId: ID!
     genre: String!
     shortDescription: String!
@@ -18,7 +17,6 @@ export const typeDefs = gql`
 
   input StoryCreateInput {
     name: String!
-    date: Float!
     genre: String!
     shortDescription: String!
     story: String!
@@ -26,7 +24,6 @@ export const typeDefs = gql`
 
   input StoryUpdateInput {
     name: String
-    date: Float
     genre: String
     shortDescription: String
     story: String
@@ -40,10 +37,10 @@ export const typeDefs = gql`
   }
 
   extend type Mutation {
-    createStory(input: StoryCreateInput): Story!
+    createStory(input: StoryCreateInput!): Story!
     addRatingForStory(storyId: ID!, rating: Int!): Story!
     deleteStory(storyId: ID!): Boolean!
-    updateStory(input: StoryUpdateInput, storyId: ID!): Story!
+    updateStory(input: StoryUpdateInput!, storyId: ID!): Story!
   }
 `;
 

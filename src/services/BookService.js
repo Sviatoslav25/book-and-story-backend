@@ -16,7 +16,7 @@ class BookService {
 
   createBook = async (book, authorId) => {
     const bookData = { ...book, createdAt: new Date(), updateAt: new Date(), authorId: new ObjectID(authorId) };
-    const result = await this.getCollection().insert(bookData);
+    const result = await this.getCollection().insertOne(bookData);
     return { ...book, _id: result.insertedId };
   };
 

@@ -6,12 +6,11 @@ export const typeDefs = gql`
   type Book {
     _id: ID!
     name: String!
-    date: Float!
     img: String!
     authorId: ID!
     genre: String!
     otherAuthors: [String]!
-    pageQuantity: Int!
+    pagesQuantity: Int!
     isPaid: Boolean!
     price: Float
     rating: Float!
@@ -26,7 +25,7 @@ export const typeDefs = gql`
     img: String!
     genre: String!
     otherAuthors: [String]!
-    pageQuantity: Int!
+    pagesQuantity: Int!
     isPaid: Boolean!
     price: Float
     description: String!
@@ -37,7 +36,7 @@ export const typeDefs = gql`
     img: String
     genre: String
     otherAuthors: [String]
-    pageQuantity: Int
+    pagesQuantity: Int
     isPaid: Boolean
     price: Float
     description: String
@@ -52,10 +51,10 @@ export const typeDefs = gql`
   }
 
   extend type Mutation {
-    createBook(input: BookCreateInput): Book!
+    createBook(input: BookCreateInput!): Book!
     addRatingForBook(bookId: ID!, rating: Int!): Book!
-    deleteBook(booId: ID!): Boolean!
-    updateBook(bookId: ID!, input: BookUpdateInput): Book!
+    deleteBook(bookId: ID!): Boolean!
+    updateBook(bookId: ID!, input: BookUpdateInput!): Book!
   }
 `;
 
@@ -77,8 +76,8 @@ export const resolvers = {
       const books = await BookService.getBooks();
       return books;
     },
-    book: async (root, { bookId }) => {
-      const book = await BookService.getBookById(bookId);
+    book: async (root, { id }) => {
+      const book = await BookService.getBookById(id);
       return book;
     },
     booksSearch: async (root, { searchString }) => {

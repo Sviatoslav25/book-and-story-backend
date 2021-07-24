@@ -18,8 +18,8 @@ export const typeDefs = gql`
 
   extend type Mutation {
     login(email: String!, password: String!): AuthResponse!
-    logout(email: String!, password: String!): Boolean
-    registration(refreshToken: String!): AuthResponse!
+    logout(token: String!): Boolean
+    registration(email: String!, password: String!): AuthResponse!
     token(refreshToken: String!): AuthResponse!
   }
 `;

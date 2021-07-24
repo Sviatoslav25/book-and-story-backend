@@ -46,7 +46,7 @@ class UserService {
     }
     const hashPassword = await bcrypt.hash(password, 10);
     user = { hashPassword, email, createAt: new Date() };
-    this.getCollection().insert(user);
+    await this.getCollection().insertOne(user);
   }
 
   async loginWithPassword({ email, password }) {
