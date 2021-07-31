@@ -1,4 +1,5 @@
 import { ObjectID, ObjectId } from 'mongodb';
+import FavoriteService from './FavoriteService';
 import MongoClientProvider from './MongoClientProvider';
 import RatingService from './RatingService';
 
@@ -9,9 +10,10 @@ class BookService {
     return MongoClientProvider.db.collection(this.collectionName);
   }
 
-  getBooks = async () => {
-    const bookList = await this.getCollection().find({}).sort({ createdAt: -1 }).toArray();
-    return RatingService.calculateRatingForBookList(bookList);
+  getBooks = async (userId) => {
+    const bookList = await this.getCollection().find({ isPrivate: false }).sort({ createdAt: -1 }).toArray();
+    const bookListWithRating = await RatingService.calculateRatingForBookList(bookList);
+    return RatingService.userCanAddRatingForBooks({ userId, bookList: bookListWithRating });
   };
 
   createBook = async (book, authorId) => {
@@ -20,21 +22,28 @@ class BookService {
     return { ...book, _id: result.insertedId };
   };
 
-  getBookById = async (_id) => {
-    return this.getCollection().findOne({ _id: ObjectId(_id) });
+  getBookById = async (_id, userId) => {
+    const book = await this.getCollection().findOne({ _id: ObjectId(_id) });
+    if (!book) {
+      throw new Error('Book not found');
+    }
+    book.isFavorite = await FavoriteService.isFavoriteBookForCurrentUser({ bookId: _id, userId });
+    return RatingService.calculateRatingForBook(book);
   };
 
-  searchBooks = async (lineForSearch) => {
+  searchBooks = async (lineForSearch, userId) => {
     const books = await this.getCollection()
       .find({
         $or: [
           { name: { $regex: lineForSearch, $options: 'i' } },
           { description: { $regex: lineForSearch, $options: 'i' } },
         ],
+        isPrivate: false,
       })
       .sort({ createdAt: -1 })
       .toArray();
-    return RatingService.calculateRatingForBookList(books);
+    const bookListWithRating = await RatingService.calculateRatingForBookList(books);
+    return RatingService.userCanAddRatingForBooks({ userId, bookList: bookListWithRating });
   };
 
   getMyBooks = async ({ userId: authorId }) => {
@@ -46,10 +55,14 @@ class BookService {
   };
 
   deleteBook = async (bookId, { userId: authorId }) => {
-    const result = await this.getCollection().removeOne({ _id: ObjectID(bookId), authorId: new ObjectID(authorId) });
+    const result = await this.getCollection().removeOne({
+      _id: new ObjectID(bookId),
+      authorId: new ObjectID(authorId),
+    });
     if (result.result.n === 0) {
       throw new Error('book has not been deleted');
     }
+    await RatingService.getCollectionForBook().remove({ bookId: new ObjectID(bookId) });
   };
 
   updateBook = async (_id, data, { userId: authorId }) => {
@@ -63,6 +76,24 @@ class BookService {
       return true;
     }
     return false;
+  };
+
+  changePrivacyOfBook = ({ bookId, authorId, isPrivate }) => {
+    return this.getCollection().updateOne(
+      { _id: new ObjectID(bookId), authorId: new ObjectID(authorId) },
+      { $set: { isPrivate } }
+    );
+  };
+
+  getFavoritesBooks = async (userId) => {
+    const result = await FavoriteService.getFavoritesBooks(userId);
+    if (result.length === 0) {
+      return [];
+    }
+    const booksId = result.map((item) => {
+      return { _id: item.bookId };
+    });
+    return this.getCollection().find({ $or: booksId }).toArray();
   };
 }
 
