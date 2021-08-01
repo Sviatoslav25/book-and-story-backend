@@ -93,7 +93,7 @@ class BookService {
     const booksId = result.map((item) => {
       return { _id: item.bookId };
     });
-    return this.getCollection().find({ $or: booksId }).toArray();
+    return this.getCollection().find({ $or: booksId, isPrivate: false }).toArray();
   };
 }
 
