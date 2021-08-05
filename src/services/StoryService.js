@@ -54,6 +54,8 @@ class StoryService {
   };
 
   deleteStory = async ({ userId: authorId, storyId }) => {
+    await RatingService.getCollectionForStories().remove({ storyId: new ObjectID(storyId) });
+    await FavoriteService.getCollectionForStories().remove({ storyId: new ObjectID(storyId) });
     const result = await this.getCollection().removeOne({
       _id: new ObjectID(storyId),
       authorId: new ObjectID(authorId),
@@ -61,7 +63,6 @@ class StoryService {
     if (result.result.n === 0) {
       throw new Error('story has not been deleted');
     }
-    await RatingService.getCollectionForStories().remove({ storyId: new ObjectID(storyId) });
   };
 
   updateStory = async (_id, data, { userId: authorId }) => {
@@ -92,7 +93,7 @@ class StoryService {
     const storiesId = result.map((item) => {
       return { _id: item.storyId };
     });
-    return this.getCollection().find({ $or: storiesId }).toArray();
+    return this.getCollection().find({ $or: storiesId, isPrivate: false }).sort({ createdAt: -1 }).toArray();
   };
 }
 

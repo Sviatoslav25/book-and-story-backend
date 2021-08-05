@@ -3,6 +3,7 @@ import { omit } from 'lodash';
 import { ObjectID } from 'mongodb';
 import AuthService from './AuthService';
 import MongoClientProvider from './MongoClientProvider';
+import ProfileService from './ProfileService';
 
 class UserService {
   collectionName = 'users';
@@ -46,7 +47,8 @@ class UserService {
     }
     const hashPassword = await bcrypt.hash(password, 10);
     user = { hashPassword, email, createAt: new Date() };
-    await this.getCollection().insertOne(user);
+    const result = await this.getCollection().insertOne(user);
+    await ProfileService.createProfile({ userId: result.insertedId, email });
   }
 
   async loginWithPassword({ email, password }) {

@@ -55,6 +55,8 @@ class BookService {
   };
 
   deleteBook = async (bookId, { userId: authorId }) => {
+    await RatingService.getCollectionForBook().remove({ bookId: new ObjectID(bookId) });
+    await FavoriteService.getCollectionForBooks().remove({ bookId: new ObjectID(bookId) });
     const result = await this.getCollection().removeOne({
       _id: new ObjectID(bookId),
       authorId: new ObjectID(authorId),
@@ -62,7 +64,6 @@ class BookService {
     if (result.result.n === 0) {
       throw new Error('book has not been deleted');
     }
-    await RatingService.getCollectionForBook().remove({ bookId: new ObjectID(bookId) });
   };
 
   updateBook = async (_id, data, { userId: authorId }) => {
@@ -93,7 +94,7 @@ class BookService {
     const booksId = result.map((item) => {
       return { _id: item.bookId };
     });
-    return this.getCollection().find({ $or: booksId, isPrivate: false }).toArray();
+    return this.getCollection().find({ $or: booksId, isPrivate: false }).sort({ createdAt: -1 }).toArray();
   };
 }
 
