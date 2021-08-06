@@ -12,6 +12,7 @@ export const typeDefs = gql`
     email: String!
     phoneNumber: String!
     aboutMyself: String!
+    isFollowed: Boolean!
   }
 
   input ProfileUpdateInput {

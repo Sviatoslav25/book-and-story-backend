@@ -1,5 +1,6 @@
 import { ObjectId, ObjectID } from 'mongodb';
 import MongoClientProvider from './MongoClientProvider';
+import SubscriptionsService from './SubscriptionsService';
 
 class ProfileService {
   collectionName = 'profile';
@@ -31,9 +32,10 @@ class ProfileService {
   };
 
   getProfileList = async (userId) => {
-    return this.getCollection()
+    const profileList = await this.getCollection()
       .find({ userId: { $ne: new ObjectID(userId) } })
       .toArray();
+    return SubscriptionsService.addedFieldIsFollowedForUsersList({ userId, userList: profileList });
   };
 
   updateProfile = async ({ userId, data }) => {
