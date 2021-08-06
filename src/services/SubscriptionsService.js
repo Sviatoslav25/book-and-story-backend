@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import MongoClientProvider from './MongoClientProvider';
+import NoticesAboutReleasedService from './NoticesAboutReleasedService';
 
 class SubscriptionsService {
   collectionName = 'subscriptions';
@@ -9,7 +10,11 @@ class SubscriptionsService {
   }
 
   addSubscription = async ({ userId, authorId }) => {
-    return this.getCollection().insertOne({ userId: new ObjectId(userId), authorId: new ObjectId(authorId) });
+    return this.getCollection().insertOne({
+      userId: new ObjectId(userId),
+      authorId: new ObjectId(authorId),
+      createdAt: new Date(),
+    });
   };
 
   removeSubscription = async ({ userId, authorId }) => {
@@ -39,6 +44,14 @@ class SubscriptionsService {
       }
       return { ...item, isFollowed: false };
     });
+  };
+
+  bookReleased = async ({ authorId, bookId }) => {
+    const userIdList = await this.getUsersSubscribedToAuthor(authorId);
+    if (userIdList.length === 0) {
+      return null;
+    }
+    return NoticesAboutReleasedService.bookReleased({ authorId, userIdList, bookId });
   };
 }
 
