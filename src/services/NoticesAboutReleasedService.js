@@ -27,8 +27,11 @@ class NoticesAboutReleasedService {
     return this.getCollectionForBook().insertMany(dataForInsert);
   };
 
-  userReadBook = async (userId) => {
-    return this.getCollectionForBook().updateOne({ userId: new ObjectId(userId) }, { $set: { isRead: true } });
+  userReadNoticeForBook = async ({ userId, noticeId }) => {
+    return this.getCollectionForBook().updateOne(
+      { userId: new ObjectId(userId), _id: new ObjectId(noticeId) },
+      { $set: { isRead: true } }
+    );
   };
 
   getNoticeForUser = async (userId) => {
@@ -43,6 +46,16 @@ class NoticesAboutReleasedService {
 
   removeBook = async (bookId) => {
     return this.getCollectionForBook().remove({ bookId: new ObjectId(bookId) });
+  };
+
+  noticeQuantity = async (userId) => {
+    const numberOfNoticeAboutReleaseOfBooks = await this.getCollectionForBook()
+      .find({
+        userId: new ObjectId(userId),
+        isRead: false,
+      })
+      .count();
+    return numberOfNoticeAboutReleaseOfBooks;
   };
 }
 
