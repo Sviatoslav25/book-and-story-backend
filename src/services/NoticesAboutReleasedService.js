@@ -40,8 +40,8 @@ class NoticesAboutReleasedService {
       .toArray();
   };
 
-  removeNotice = async (userId, _id) => {
-    return this.getCollectionForBook().removeOne({ userId: new ObjectId(userId), _id: new ObjectId(_id) });
+  removeNoticeForBook = async ({ userId, noticeId }) => {
+    return this.getCollectionForBook().removeOne({ userId: new ObjectId(userId), _id: new ObjectId(noticeId) });
   };
 
   removeBook = async (bookId) => {

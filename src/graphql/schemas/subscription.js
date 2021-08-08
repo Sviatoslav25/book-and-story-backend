@@ -23,7 +23,8 @@ export const typeDefs = gql`
   extend type Mutation {
     subscribe(authorId: ID!): Boolean!
     unsubscribe(authorId: ID!): Boolean!
-    readNoticeForBooks(noticeId: ID!): Boolean!
+    readNoticeForBook(noticeId: ID!): Boolean!
+    removeNoticeForBook(noticeId: ID!): Boolean!
   }
 `;
 
@@ -56,10 +57,16 @@ export const resolvers = {
       await SubscriptionsService.removeSubscription({ userId, authorId });
       return true;
     },
-    readNoticeForBooks: async (root, { noticeId }, context) => {
+    readNoticeForBook: async (root, { noticeId }, context) => {
       isAuthorizedUser(context);
       const { userId } = context;
       await NoticesAboutReleasedService.userReadNoticeForBook({ noticeId, userId });
+      return true;
+    },
+    removeNoticeForBook: async (root, { noticeId }, context) => {
+      isAuthorizedUser(context);
+      const { userId } = context;
+      await NoticesAboutReleasedService.removeNoticeForBook({ userId, noticeId });
       return true;
     },
   },
