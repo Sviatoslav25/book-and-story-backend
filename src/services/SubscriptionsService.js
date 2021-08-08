@@ -53,6 +53,14 @@ class SubscriptionsService {
     }
     return NoticesAboutReleasedService.bookReleased({ authorId, userIdList, bookId });
   };
+
+  storyReleased = async ({ authorId, storyId }) => {
+    const userIdList = await this.getUsersSubscribedToAuthor(authorId);
+    if (userIdList.length === 0) {
+      return null;
+    }
+    return NoticesAboutReleasedService.storyReleased({ authorId, userIdList, storyId });
+  };
 }
 
 export default new SubscriptionsService();

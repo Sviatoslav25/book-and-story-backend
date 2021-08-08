@@ -1,12 +1,13 @@
 import { gql } from 'apollo-server-express';
 import BookService from '../../services/BookService';
+import StoryService from '../../services/StoryService';
 import NoticesAboutReleasedService from '../../services/NoticesAboutReleasedService';
 import ProfileService from '../../services/ProfileService';
 import SubscriptionsService from '../../services/SubscriptionsService';
 import isAuthorizedUser from '../isAuthorizedUser';
 
 export const typeDefs = gql`
-  type Notice {
+  type NoticeForBook {
     _id: ID!
     authorId: ID!
     userId: ID!
@@ -15,9 +16,20 @@ export const typeDefs = gql`
     author: Profile!
     book: Book!
   }
+
+  type NoticeForStory {
+    _id: ID!
+    authorId: ID!
+    userId: ID!
+    storyId: ID!
+    isRead: Boolean!
+    author: Profile!
+    story: Story!
+  }
   extend type Query {
-    noticesAboutBookReleased: [Notice]!
+    noticesAboutBookReleased: [NoticeForBook]!
     noticesQuantity: Int!
+    noticesAboutStoryReleased: [NoticeForStory]!
   }
 
   extend type Mutation {
@@ -25,6 +37,8 @@ export const typeDefs = gql`
     unsubscribe(authorId: ID!): Boolean!
     readNoticeForBook(noticeId: ID!): Boolean!
     removeNoticeForBook(noticeId: ID!): Boolean!
+    readNoticeForStory(noticeId: ID!): Boolean!
+    removeNoticeForStory(noticeId: ID!): Boolean!
   }
 `;
 
@@ -33,7 +47,7 @@ export const resolvers = {
     noticesAboutBookReleased: async (root, params, context) => {
       isAuthorizedUser(context);
       const { userId } = context;
-      const notices = await NoticesAboutReleasedService.getNoticeForUser(userId);
+      const notices = await NoticesAboutReleasedService.getNoticeForReleasedBook(userId);
       return notices;
     },
     noticesQuantity: async (root, params, context) => {
@@ -41,6 +55,12 @@ export const resolvers = {
       const { userId } = context;
       const noticeQuantity = await NoticesAboutReleasedService.noticeQuantity(userId);
       return noticeQuantity;
+    },
+    noticesAboutStoryReleased: async (root, params, context) => {
+      isAuthorizedUser(context);
+      const { userId } = context;
+      const notices = await NoticesAboutReleasedService.getNoticeForReleasedStory(userId);
+      return notices;
     },
   },
 
@@ -63,14 +83,26 @@ export const resolvers = {
       await NoticesAboutReleasedService.userReadNoticeForBook({ noticeId, userId });
       return true;
     },
+    readNoticeForStory: async (root, { noticeId }, context) => {
+      isAuthorizedUser(context);
+      const { userId } = context;
+      await NoticesAboutReleasedService.userReadNoticeForStory({ noticeId, userId });
+      return true;
+    },
     removeNoticeForBook: async (root, { noticeId }, context) => {
       isAuthorizedUser(context);
       const { userId } = context;
       await NoticesAboutReleasedService.removeNoticeForBook({ userId, noticeId });
       return true;
     },
+    removeNoticeForStory: async (root, { noticeId }, context) => {
+      isAuthorizedUser(context);
+      const { userId } = context;
+      await NoticesAboutReleasedService.removeNoticeForStory({ userId, noticeId });
+      return true;
+    },
   },
-  Notice: {
+  NoticeForBook: {
     author: async ({ authorId }) => {
       const profile = await ProfileService.getProfileByUserId(authorId);
       return profile;
@@ -78,6 +110,17 @@ export const resolvers = {
     book: async ({ bookId }, params, { userId }) => {
       const book = await BookService.getBookById(bookId, userId);
       return book;
+    },
+  },
+
+  NoticeForStory: {
+    author: async ({ authorId }) => {
+      const profile = await ProfileService.getProfileByUserId(authorId);
+      return profile;
+    },
+    story: async ({ storyId }, params, { userId }) => {
+      const story = await StoryService.getStoryById(storyId, userId);
+      return story;
     },
   },
 };

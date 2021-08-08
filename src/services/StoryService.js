@@ -1,7 +1,9 @@
 import { ObjectID, ObjectId } from 'mongodb';
 import FavoriteService from './FavoriteService';
 import MongoClientProvider from './MongoClientProvider';
+import NoticesAboutReleasedService from './NoticesAboutReleasedService';
 import RatingService from './RatingService';
+import SubscriptionsService from './SubscriptionsService';
 
 class StoryService {
   collectionName = 'stories';
@@ -28,6 +30,7 @@ class StoryService {
   createStory = async (story, authorId) => {
     const storyData = { ...story, createdAt: new Date(), updateAt: new Date(), authorId: new ObjectID(authorId) };
     const result = await this.getCollection().insertOne(storyData);
+    await SubscriptionsService.storyReleased({ authorId, storyId: result.insertedId });
     return { ...story, _id: result.insertedId };
   };
 
@@ -56,6 +59,7 @@ class StoryService {
   deleteStory = async ({ userId: authorId, storyId }) => {
     await RatingService.getCollectionForStories().remove({ storyId: new ObjectID(storyId) });
     await FavoriteService.getCollectionForStories().remove({ storyId: new ObjectID(storyId) });
+    await NoticesAboutReleasedService.removeStory(storyId);
     const result = await this.getCollection().removeOne({
       _id: new ObjectID(storyId),
       authorId: new ObjectID(authorId),
