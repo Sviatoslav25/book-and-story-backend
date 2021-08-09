@@ -14,7 +14,7 @@ export const typeDefs = gql`
     bookId: ID!
     isRead: Boolean!
     author: Profile!
-    book: Book!
+    book: Book
   }
 
   type NoticeForStory {
@@ -24,7 +24,7 @@ export const typeDefs = gql`
     storyId: ID!
     isRead: Boolean!
     author: Profile!
-    story: Story!
+    story: Story
   }
   extend type Query {
     noticesAboutBookReleased: [NoticeForBook]!
@@ -108,8 +108,15 @@ export const resolvers = {
       return profile;
     },
     book: async ({ bookId }, params, { userId }) => {
-      const book = await BookService.getBookById(bookId, userId);
-      return book;
+      try {
+        const book = await BookService.getBookById(bookId, userId);
+        return book;
+      } catch (e) {
+        if (e.message === 'Book is Private') {
+          return { name: '', img: '', isPrivate: true };
+        }
+        throw new Error(e.message);
+      }
     },
   },
 
@@ -119,8 +126,15 @@ export const resolvers = {
       return profile;
     },
     story: async ({ storyId }, params, { userId }) => {
-      const story = await StoryService.getStoryById(storyId, userId);
-      return story;
+      try {
+        const story = await StoryService.getStoryById(storyId, userId);
+        return story;
+      } catch (e) {
+        if (e.message === 'Story is private') {
+          return { name: '', img: '', isPrivate: true };
+        }
+        throw new Error(e.message);
+      }
     },
   },
 };

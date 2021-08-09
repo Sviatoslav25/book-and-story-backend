@@ -23,6 +23,9 @@ class StoryService {
     if (!story) {
       throw new Error('Story not found');
     }
+    if (story.idPrivate && !story.authorId.equals(new ObjectId(userId))) {
+      throw new Error('Story is Private');
+    }
     story.isFavorite = await FavoriteService.isFavoriteStoryForCurrentUser({ storyId: _id, userId });
     return RatingService.calculateRatingForStory(story);
   };

@@ -30,6 +30,9 @@ class BookService {
     if (!book) {
       throw new Error('Book not found');
     }
+    if (book.isPrivate && !book.authorId.equals(new ObjectId(userId))) {
+      throw new Error('Book is Private');
+    }
     book.isFavorite = await FavoriteService.isFavoriteBookForCurrentUser({ bookId: _id, userId });
     return RatingService.calculateRatingForBook(book);
   };

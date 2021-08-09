@@ -154,7 +154,7 @@ export const resolvers = {
       const { userId } = context;
       await safeFindBook(bookId, userId);
       await BookService.changePrivacyOfBook({ bookId, isPrivate, authorId: userId });
-      const book = await BookService.getBookById(bookId);
+      const book = await BookService.getBookById(bookId, userId);
       return book;
     },
     addBookToFavorites: async (root, { bookId }, context) => {
