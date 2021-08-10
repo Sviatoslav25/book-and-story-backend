@@ -113,7 +113,7 @@ export const resolvers = {
       isAuthorizedUser(context);
       const { userId } = context;
       await RatingService.addRatingForStories({ storyId, rating, userId });
-      const story = StoryService.getStoryById(storyId);
+      const story = StoryService.getStoryById(storyId, userId);
       return story;
     },
     deleteStory: async (root, { storyId }, context) => {
@@ -127,7 +127,7 @@ export const resolvers = {
       isAuthorizedUser(context);
       const { userId } = context;
       await StoryService.updateStory(storyId, input, { userId });
-      const story = StoryService.getStoryById(storyId);
+      const story = StoryService.getStoryById(storyId, userId);
       return story;
     },
     changePrivacyOfStory: async (root, { storyId, isPrivate }, context) => {
@@ -135,7 +135,7 @@ export const resolvers = {
       const { userId } = context;
       await safeFindStory(storyId, userId);
       await StoryService.changePrivacyOfStory({ storyId, isPrivate, authorId: userId });
-      const story = await StoryService.getStoryById(storyId);
+      const story = await StoryService.getStoryById(storyId, userId);
       return story;
     },
     addStoryToFavorites: async (root, { storyId }, context) => {

@@ -132,7 +132,7 @@ export const resolvers = {
         userId,
         rating,
       });
-      const book = await BookService.getBookById(bookId);
+      const book = await BookService.getBookById(bookId, userId);
       return book;
     },
     deleteBook: async (root, { bookId }, context) => {
@@ -146,7 +146,7 @@ export const resolvers = {
       isAuthorizedUser(context);
       const { userId } = context;
       await BookService.updateBook(bookId, input, { userId });
-      const book = await BookService.getBookById(bookId);
+      const book = await BookService.getBookById(bookId, userId);
       return book;
     },
     changePrivacyOfBook: async (root, { bookId, isPrivate }, context) => {
