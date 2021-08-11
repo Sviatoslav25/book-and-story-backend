@@ -100,7 +100,19 @@ class StoryService {
     const storiesId = result.map((item) => {
       return { _id: item.storyId };
     });
-    return this.getCollection().find({ $or: storiesId, isPrivate: false }).sort({ createdAt: -1 }).toArray();
+    const favoritesStories = await this.getCollection()
+      .find({ $or: storiesId, isPrivate: false })
+      .sort({ createdAt: -1 })
+      .toArray();
+    return RatingService.calculateRatingForStoryList(favoritesStories);
+  };
+
+  getStoriesByUserId = async (userId) => {
+    const userStories = await this.getCollection()
+      .find({ authorId: new ObjectId(userId), isPrivate: false })
+      .sort({ createdAt: -1 })
+      .toArray();
+    return RatingService.calculateRatingForStoryList(userStories);
   };
 }
 

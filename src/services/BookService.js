@@ -101,7 +101,19 @@ class BookService {
     const booksId = result.map((item) => {
       return { _id: item.bookId };
     });
-    return this.getCollection().find({ $or: booksId, isPrivate: false }).sort({ createdAt: -1 }).toArray();
+    const favoritesBooks = await this.getCollection()
+      .find({ $or: booksId, isPrivate: false })
+      .sort({ createdAt: -1 })
+      .toArray();
+    return RatingService.calculateRatingForBookList(favoritesBooks);
+  };
+
+  getBooksByUserId = async (userId) => {
+    const userBooks = await this.getCollection()
+      .find({ authorId: new ObjectId(userId), isPrivate: false })
+      .sort({ createdAt: -1 })
+      .toArray();
+    return RatingService.calculateRatingForBookList(userBooks);
   };
 }
 

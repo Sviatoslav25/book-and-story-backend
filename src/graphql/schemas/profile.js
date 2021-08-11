@@ -1,5 +1,7 @@
 import { gql } from 'apollo-server-express';
+import BookService from '../../services/BookService';
 import ProfileService from '../../services/ProfileService';
+import StoryService from '../../services/StoryService';
 import isAuthorizedUser from '../isAuthorizedUser';
 
 export const typeDefs = gql`
@@ -28,6 +30,8 @@ export const typeDefs = gql`
     profiles: [Profile]!
     profile(profileId: ID!): Profile!
     myProfile: Profile!
+    userBooks(userId: ID!): [Book]!
+    userStories(userId: ID!): [Story]!
   }
 
   extend type Mutation {
@@ -53,6 +57,17 @@ export const resolvers = {
       const { userId } = context;
       const profile = await ProfileService.getProfileByUserId(userId);
       return profile;
+    },
+    userBooks: async (root, { userId }, context) => {
+      isAuthorizedUser(context);
+      const userBooks = await BookService.getBooksByUserId(userId);
+      return userBooks;
+    },
+
+    userStories: async (root, { userId }, context) => {
+      isAuthorizedUser(context);
+      const userStories = await StoryService.getStoriesByUserId(userId);
+      return userStories;
     },
   },
 
