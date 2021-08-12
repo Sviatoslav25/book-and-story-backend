@@ -2,6 +2,7 @@ import { gql } from 'apollo-server-express';
 import BookService from '../../services/BookService';
 import ProfileService from '../../services/ProfileService';
 import StoryService from '../../services/StoryService';
+import SubscriptionsService from '../../services/SubscriptionsService';
 import isAuthorizedUser from '../isAuthorizedUser';
 
 export const typeDefs = gql`
@@ -32,6 +33,10 @@ export const typeDefs = gql`
     myProfile: Profile!
     userBooks(userId: ID!): [Book]!
     userStories(userId: ID!): [Story]!
+    userFollowersQuantity(userId: ID!): Int!
+    userFollowingQuantity(userId: ID!): Int!
+    myFollowersQuantity: Int!
+    myFollowingQuantity: Int!
   }
 
   extend type Mutation {
@@ -68,6 +73,31 @@ export const resolvers = {
       isAuthorizedUser(context);
       const userStories = await StoryService.getStoriesByUserId(userId);
       return userStories;
+    },
+    userFollowersQuantity: async (root, { userId }, context) => {
+      isAuthorizedUser(context);
+      const userFollowersQuantity = SubscriptionsService.getUserFollowersQuantity(userId);
+      return userFollowersQuantity;
+    },
+
+    userFollowingQuantity: async (root, { userId }, context) => {
+      isAuthorizedUser(context);
+      const userFollowingQuantity = SubscriptionsService.getUserFollowingQuantity(userId);
+      return userFollowingQuantity;
+    },
+
+    myFollowersQuantity: async (root, params, context) => {
+      isAuthorizedUser(context);
+      const { userId } = context;
+      const myFollowersQuantity = SubscriptionsService.getUserFollowersQuantity(userId);
+      return myFollowersQuantity;
+    },
+
+    myFollowingQuantity: async (root, params, context) => {
+      isAuthorizedUser(context);
+      const { userId } = context;
+      const myFollowingQuantity = SubscriptionsService.getUserFollowingQuantity(userId);
+      return myFollowingQuantity;
     },
   },
 

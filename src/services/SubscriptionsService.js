@@ -61,6 +61,18 @@ class SubscriptionsService {
     }
     return NoticesAboutReleasedService.storyReleased({ authorId, userIdList, storyId });
   };
+
+  getUserFollowersQuantity = async (userId) => {
+    return this.getCollection()
+      .find({ authorId: new ObjectId(userId) })
+      .count();
+  };
+
+  getUserFollowingQuantity = async (userId) => {
+    return this.getCollection()
+      .find({ userId: new ObjectId(userId) })
+      .count();
+  };
 }
 
 export default new SubscriptionsService();
